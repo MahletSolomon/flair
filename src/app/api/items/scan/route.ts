@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { barcode, name, description, languageCode } = parsed.data;
+    const { barcode, name } = parsed.data;
 
     const existing = await db
       .select()
@@ -31,8 +31,8 @@ export async function POST(req: NextRequest) {
         .values({
           barcode,
           name: name ?? null,
-          description: description ?? null,
-          languageCode: languageCode ?? null,
+          // description: description ?? null,
+          // languageCode: languageCode ?? null,
         })
         .returning();
 
