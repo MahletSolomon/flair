@@ -43,7 +43,7 @@ export function BarcodeScannerForm() {
     setSuccessMsg(null);
 
     const res = await checkItemByBarcode(value);
-    if (res.error) {
+    if (res.error || !res.data) {
       setGlobalError(res.error);
       setChecking(false);
       return;
@@ -113,7 +113,7 @@ export function BarcodeScannerForm() {
         itemId = res.data.id;
       } else {
         const res = await checkItemByBarcode(barcode);
-        if (res.error || !res.data.exists || !res.data.item) {
+        if (res.error || !res.data || !res.data.item) {
           throw new Error(res.error || "Item not found, please rescan");
         }
         itemId = res.data.item.id;
@@ -138,7 +138,7 @@ export function BarcodeScannerForm() {
       }
 
       const entryRes = await createEntry(entryParse.data);
-      if (entryRes.error) {
+      if (entryRes.error || !entryRes.data) {
         throw new Error(entryRes.error);
       }
 

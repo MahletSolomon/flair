@@ -33,7 +33,7 @@ export function CameraBarcodeScanner({ onDetected, onClose }: Props) {
 
     codeReader
       .decodeFromVideoDevice(
-        null, // let library pick the default camera
+        undefined, // let library pick the default camera
         videoEl,
         (result, err, controls) => {
           if (!controlsRef.current && controls) {
@@ -44,7 +44,6 @@ export function CameraBarcodeScanner({ onDetected, onClose }: Props) {
             const text = result.getText();
             // Stop scanning as soon as we get a barcode
             controlsRef.current?.stop();
-            codeReader.reset();
             onDetected(text);
             onClose();
           }
@@ -65,7 +64,7 @@ export function CameraBarcodeScanner({ onDetected, onClose }: Props) {
     return () => {
       try {
         controlsRef.current?.stop();
-        codeReader.reset();
+        // codeReader.reset();
       } catch {
         // ignore cleanup errors
       }

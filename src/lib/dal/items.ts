@@ -72,3 +72,10 @@ export async function createEntry(
     body: JSON.stringify(payload),
   });
 }
+
+
+export function hasData<T>(
+  res: ApiResult<T>,
+): res is { data: T; error: null } {
+  return res.error === null && res.data !== null;
+}
