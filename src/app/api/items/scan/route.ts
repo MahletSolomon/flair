@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db/db";
 import { items, scans } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { scanItemSchema } from "@/lib/validation/items";
+import { createItemSchema } from "@/lib/validation/items";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const parsed = scanItemSchema.safeParse(body);
+    const parsed = createItemSchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(

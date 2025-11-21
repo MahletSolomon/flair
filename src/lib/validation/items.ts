@@ -14,7 +14,7 @@ export const createEntrySchema = z.object({
   itemId: z.number().int().positive(),
   size: z.string().min(1, "Size is required"),
   quantity: z
-    .number({ invalid_type_error: "Quantity must be a number" })
+    .number({ error: "Quantity must be a number" })
     .int("Quantity must be an integer")
     .positive("Quantity must be positive"),
 });
