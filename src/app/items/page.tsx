@@ -47,9 +47,9 @@ export default async function ItemsPage() {
                   <td className="px-3 py-2 hidden sm:table-cell">
                     {item.name ?? "-"}
                   </td>
-                  <td className="px-3 py-2 hidden md:table-cell">
+                  {/* <td className="px-3 py-2 hidden md:table-cell">
                     {item.languageCode ?? "-"}
-                  </td>
+                  </td> */}
                   <td className="px-3 py-2 hidden lg:table-cell text-xs text-slate-400">
                     {typeof item.createdAt === "string"
                       ? item.createdAt

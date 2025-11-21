@@ -1,23 +1,61 @@
 import { buildUrl, jsonFetch } from "@/lib/http";
 import type {
-  Item, Entry, CreateItemInput, CreateEntryInput
+  Item,
+  Entry,
+  CreateEntryInput,
 } from "@/lib/validation/items";
 
-export type ApiResult<T> = { data: T | null; error: string };
-export const hasData = <T,>(r: ApiResult<T>): r is { data: T; error: "" } =>
-  r.error === "" && r.data !== null;
+export type ApiResult<T> = {
+  data: T | null;
+  error: string; // "" means no error
+};
 
-export async function checkItemByBarcode(barcode: string): Promise<ApiResult<{ exists: boolean; item: Item | null }>> {
+// ---- Helpers ----
+
+export function hasData<T>(
+  res: ApiResult<T>,
+): res is { data: T; error: "" } {
+  return res.error === "" && res.data !== null;
+}
+
+// ---- Items ----
+
+export async function getAllItems(): Promise<ApiResult<Item[]>> {
+  const url = buildUrl("/api/items");
+  const { data, error } = await jsonFetch<Item[]>(url);
+  return { data, error };
+}
+
+export async function checkItemByBarcode(
+  barcode: string,
+): Promise<ApiResult<{ exists: boolean; item: Item | null }>> {
   const url = buildUrl("/api/items/check", { barcode });
-  return jsonFetch<{ exists: boolean; item: Item | null }>(url);
+  const { data, error } = await jsonFetch<{ exists: boolean; item: Item | null }>(
+    url,
+  );
+  return { data, error };
 }
 
-export async function createItem(payload: CreateItemInput): Promise<ApiResult<Item>> {
-  const url = buildUrl("/api/items/create");
-  return jsonFetch<Item>(url, { method: "POST", body: JSON.stringify(payload) });
+export async function scanOrCreateItem(
+  payload: { barcode: string; name?: string },
+): Promise<ApiResult<Item>> {
+  const url = buildUrl("/api/items/scan");
+  const { data, error } = await jsonFetch<Item>(url, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+  return { data, error };
 }
 
-export async function createEntry(payload: CreateEntryInput): Promise<ApiResult<Entry>> {
+// ---- Entries ----
+
+export async function createEntry(
+  payload: CreateEntryInput,
+): Promise<ApiResult<{ entry: Entry }>> {
   const url = buildUrl("/api/entries/create");
-  return jsonFetch<Entry>(url, { method: "POST", body: JSON.stringify(payload) });
+  const { data, error } = await jsonFetch<{ entry: Entry }>(url, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+  return { data, error };
 }
