@@ -10,21 +10,13 @@ export async function GET(req: NextRequest) {
 
   const parsed = checkBarcodeSchema.safeParse({ barcode });
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.format() },
-      { status: 400 },
-    );
-  }
-  
-
-  const result = await db
-    .select()
-    .from(items)
-    .where(eq(items.barcode, parsed.data.barcode));
-
-  if (result.length === 0) {
-    return NextResponse.json({ exists: false, item: null });
+    return NextResponse.json({ error: parsed.error.format() }, { status: 400 });
   }
 
-  return NextResponse.json({ exists: true, item: result[0] });
+  const found = await db.select().from(items).where(eq(items.barcode, parsed.data.barcode));
+  const item = found[0] ?? null;
+
+  return NextResponse.json({
+    data: { exists: !!item, item },
+  });
 }

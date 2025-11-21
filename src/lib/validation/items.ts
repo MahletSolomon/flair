@@ -1,47 +1,40 @@
 import { z } from "zod";
 
+// ✅ Only what we need now
 export const checkBarcodeSchema = z.object({
   barcode: z.string().min(1, "Barcode is required"),
 });
 
-export const scanItemSchema = z.object({
+export const createItemSchema = z.object({
   barcode: z.string().min(1, "Barcode is required"),
-  name: z.string().optional(),
-  description: z.string().optional(),
-  languageCode: z.string().optional(),
+  name: z.string().min(1, "Name is required"),
 });
 
 export const createEntrySchema = z.object({
   itemId: z.number().int().positive(),
-  size: z.string().optional(),
+  size: z.string().min(1, "Size is required"),
   quantity: z
-    .number({
-      error: "Quantity must be a number",
-    })
+    .number({ invalid_type_error: "Quantity must be a number" })
     .int("Quantity must be an integer")
     .positive("Quantity must be positive"),
 });
 
-// ----- Types -----
+// Types
 export type CheckBarcodeInput = z.infer<typeof checkBarcodeSchema>;
-export type ScanItemInput = z.infer<typeof scanItemSchema>;
+export type CreateItemInput = z.infer<typeof createItemSchema>;
 export type CreateEntryInput = z.infer<typeof createEntrySchema>;
 
-// API response shapes
 export type Item = {
   id: number;
   barcode: string;
-  name: string | null;
-  description: string | null;
-  languageCode: string | null;
+  name: string;
   createdAt: string | Date;
-  updatedAt: string | Date;
 };
 
 export type Entry = {
   id: number;
   itemId: number;
-  size: string | null;
+  size: string;
   quantity: number;
   createdAt: string | Date;
 };
