@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
       { status: 400 },
     );
   }
+  
 
   const result = await db
     .select()
