@@ -53,7 +53,7 @@ export async function scanOrCreateItem(
 export async function createEntry(
   payload: CreateEntryInput,
 ): Promise<ApiResult<{ entry: Entry }>> {
-  const url = buildUrl("/api/entries/create");
+  const url = buildUrl("/api/items/create");
   const { data, error } = await jsonFetch<{ entry: Entry }>(url, {
     method: "POST",
     body: JSON.stringify(payload),

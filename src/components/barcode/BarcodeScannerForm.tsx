@@ -221,7 +221,7 @@ export function BarcodeScannerForm() {
                 )}
               </div>
 
-              <div className="space-y-1">
+              {/* <div className="space-y-1">
                 <Label htmlFor="languageCode">Language</Label>
                 <Input
                   id="languageCode"
@@ -230,9 +230,9 @@ export function BarcodeScannerForm() {
                   placeholder="en / de / am..."
                   disabled={itemExists}
                 />
-              </div>
+              </div> */}
 
-              <div className="space-y-1 md:col-span-2">
+              {/* <div className="space-y-1 md:col-span-2">
                 <Label htmlFor="description">Description</Label>
                 <Input
                   id="description"
@@ -241,7 +241,7 @@ export function BarcodeScannerForm() {
                   placeholder="Short description"
                   disabled={itemExists}
                 />
-              </div>
+              </div> */}
             </div>
 
             {/* Entry fields */}
