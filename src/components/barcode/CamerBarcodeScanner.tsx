@@ -22,7 +22,6 @@ export function CameraBarcodeScanner({ onDetected, onClose }: Props) {
     const videoEl = videoRef.current;
     if (!videoEl) return;
 
-    // Basic browser support check
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       setError("Camera API not supported in this browser.");
       setIsStarting(false);
@@ -31,24 +30,29 @@ export function CameraBarcodeScanner({ onDetected, onClose }: Props) {
 
     const codeReader = new BrowserMultiFormatReader();
 
-    codeReader
-      .decodeFromVideoDevice(
-        undefined, // let library pick the default camera
-        videoEl,
-        (result, err, controls) => {
-          if (!controlsRef.current && controls) {
-            controlsRef.current = controls;
-          }
+    // Ask the browser for a decent resolution + back camera
+    const constraints: MediaStreamConstraints = {
+      video: {
+        facingMode: { ideal: "environment" },
+        width: { ideal: 1280 }, // bump this if device can handle it
+        height: { ideal: 720 },
+      },
+      audio: false,
+    };
 
-          if (result) {
-            const text = result.getText();
-            // Stop scanning as soon as we get a barcode
-            controlsRef.current?.stop();
-            onDetected(text);
-            onClose();
-          }
+    codeReader
+      .decodeFromConstraints(constraints, videoEl, (result, err, controls) => {
+        if (!controlsRef.current && controls) {
+          controlsRef.current = controls;
         }
-      )
+
+        if (result) {
+          const text = result.getText();
+          controlsRef.current?.stop();
+          onDetected(text);
+          onClose();
+        }
+      })
       .then(() => {
         setIsStarting(false);
       })
@@ -64,12 +68,10 @@ export function CameraBarcodeScanner({ onDetected, onClose }: Props) {
     return () => {
       try {
         controlsRef.current?.stop();
-        // codeReader.reset();
       } catch {
-        // ignore cleanup errors
+        // ignore
       }
 
-      // Also stop the media stream tracks if any
       const stream = videoEl.srcObject as MediaStream | null;
       stream?.getTracks().forEach((t) => t.stop());
     };
@@ -111,7 +113,10 @@ export function CameraBarcodeScanner({ onDetected, onClose }: Props) {
           {isStarting && !error && <p>Starting camera…</p>}
           {error && <p className="text-red-400">{error}</p>}
           {!error && (
-            <p>Align the barcode inside the box. It will scan automatically.</p>
+            <p>
+              Hold the barcode ~10–20cm away and keep it inside the box. The
+              camera will refocus and scan automatically.
+            </p>
           )}
         </div>
       </div>

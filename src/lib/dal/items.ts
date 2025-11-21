@@ -1,3 +1,4 @@
+import { buildUrl, jsonFetch } from "@/lib/http";
 import type {
   Item,
   Entry,
@@ -5,61 +6,46 @@ import type {
   CreateEntryInput,
 } from "@/lib/validation/items";
 
-type ApiResult<T> =
-  | { data: T; error: null }
-  | { data: null; error: string };
+export type ApiResult<T> = {
+  data: T | null;
+  error: string; // "" means no error
+};
 
-export async function apiFetch<T>(
-  input: RequestInfo,
-  init?: RequestInit,
-): Promise<ApiResult<T>> {
-  try {
-    const res = await fetch(input, {
-      ...init,
-      headers: {
-        "Content-Type": "application/json",
-        ...(init?.headers || {}),
-      },
-    });
+// ---- Helpers ----
 
-    const body = await res.json();
-
-    if (!res.ok) {
-      const msg =
-        body?.error
-          ? typeof body.error === "string"
-            ? body.error
-            : "Validation error"
-          : "Request failed";
-      return { data: null, error: msg };
-    }
-
-    return { data: body.data ?? body, error: null };
-  } catch (e: any) {
-    return { data: null, error: e?.message || "Network error" };
-  }
+export function hasData<T>(
+  res: ApiResult<T>,
+): res is { data: T; error: "" } {
+  return res.error === "" && res.data !== null;
 }
 
 // ---- Items ----
 
 export async function getAllItems(): Promise<ApiResult<Item[]>> {
-  return apiFetch<Item[]>("/api/items");
+  const url = buildUrl("/api/items");
+  const { data, error } = await jsonFetch<Item[]>(url);
+  return { data, error };
 }
 
 export async function checkItemByBarcode(
   barcode: string,
 ): Promise<ApiResult<{ exists: boolean; item: Item | null }>> {
-  const url = `/api/items/check?barcode=${encodeURIComponent(barcode)}`;
-  return apiFetch<{ exists: boolean; item: Item | null }>(url);
+  const url = buildUrl("/api/items/check", { barcode });
+  const { data, error } = await jsonFetch<{ exists: boolean; item: Item | null }>(
+    url,
+  );
+  return { data, error };
 }
 
 export async function scanOrCreateItem(
   payload: ScanItemInput,
 ): Promise<ApiResult<Item>> {
-  return apiFetch<Item>("/api/items/scan", {
+  const url = buildUrl("/api/items/scan");
+  const { data, error } = await jsonFetch<Item>(url, {
     method: "POST",
     body: JSON.stringify(payload),
   });
+  return { data, error };
 }
 
 // ---- Entries ----
@@ -67,15 +53,10 @@ export async function scanOrCreateItem(
 export async function createEntry(
   payload: CreateEntryInput,
 ): Promise<ApiResult<{ entry: Entry }>> {
-  return apiFetch<{ entry: Entry }>("/api/entries/create", {
+  const url = buildUrl("/api/entries/create");
+  const { data, error } = await jsonFetch<{ entry: Entry }>(url, {
     method: "POST",
     body: JSON.stringify(payload),
   });
-}
-
-
-export function hasData<T>(
-  res: ApiResult<T>,
-): res is { data: T; error: null } {
-  return res.error === null && res.data !== null;
+  return { data, error };
 }
