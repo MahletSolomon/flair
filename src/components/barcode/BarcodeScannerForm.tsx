@@ -33,7 +33,7 @@ export function BarcodeScannerForm() {
   const [lookupMsg, setLookupMsg] = useState<string | null>(null);
 
   async function handleLookup(code: string) {
-    if (!code) return;
+    if (!code || code === "123") return;
 
     setChecking(true);
     setError(null);
@@ -47,6 +47,7 @@ export function BarcodeScannerForm() {
       setChecking(false);
       return;
     }
+    
 
     const exists = res.data!.exists;
     const item = res.data!.item;
@@ -59,7 +60,7 @@ export function BarcodeScannerForm() {
     } else {
       // New item → clear id, allow editing, and auto-lookup
       setItemId(null);
-
+      setName(""); 
       // Only auto-fill if the user hasn't typed anything yet
       if (!name.trim()) {
         setLookupBusy(true);

@@ -10,7 +10,7 @@ import {
 // Items table: one row per unique barcode
 export const items = pgTable("items", {
   id: serial("id").primaryKey(),
-  barcode: varchar("barcode", { length: 64 }).notNull().unique(),
+  barcode: varchar("barcode", { length: 64 }).notNull().unique().default("123"),
   name: text("name"),
   description: text("description"),
   languageCode: varchar("language_code", { length: 10 }),
