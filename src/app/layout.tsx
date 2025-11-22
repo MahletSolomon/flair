@@ -1,5 +1,10 @@
-import Link from "next/link";
+import type { Metadata } from "next";
 import "./globals.css";
+import { SidebarToggle, AppSidebar } from "@/components/layout/app-sidebar";
+
+export const metadata: Metadata = {
+  title: "Inventory",
+};
 
 export default function RootLayout({
   children,
@@ -9,29 +14,22 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="min-h-dvh grid grid-cols-[220px_1fr]">
-          <aside className="border-r border-slate-200 bg-slate-50">
-            <div className="px-4 py-4">
-              <h1 className="text-lg font-semibold">Inventory</h1>
+        {/* Top bar (stays fixed width; sidebar overlays via Sheet) */}
+        <header className="sticky top-0 z-40 border-b bg-white">
+          <div className="container mx-auto px-4 h-14 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <SidebarToggle />
+              <span className="font-semibold">Inventory</span>
             </div>
-            <nav className="px-2 space-y-1 text-sm">
-              <Link
-                href="/items"
-                className="block rounded-md px-3 py-2 hover:bg-slate-100"
-              >
-                All Items
-              </Link>
-              <Link
-                href="/"
-                className="block rounded-md px-3 py-2 hover:bg-slate-100"
-              >
-                New Item
-              </Link>
-            </nav>
-          </aside>
+            <div />
+          </div>
+        </header>
 
-          <main className="p-4">{children}</main>
-        </div>
+        {/* Sidebar overlay lives at root so it can cover everything */}
+        <AppSidebar />
+
+        {/* Page content */}
+        <main className="container mx-auto px-4 py-4">{children}</main>
       </body>
     </html>
   );
