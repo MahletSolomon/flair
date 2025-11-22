@@ -55,10 +55,10 @@ export function AppSidebar() {
       isActive: pathname === "/items",
     },
     {
-      href: "/new",
+      href: "/",
       label: "New Item",
       icon: PlusSquare,
-      isActive: pathname === "/new",
+      isActive: pathname === "/",
     },
   ];
 
