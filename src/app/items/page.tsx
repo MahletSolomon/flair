@@ -3,6 +3,7 @@ import Link from "next/link";
 
 export default async function ItemsPage() {
   const res = await getAllItems();
+  console.log("ItemsPage res:", res);
 
   const items = res.data ?? [];
 

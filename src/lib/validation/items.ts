@@ -6,7 +6,7 @@ export const checkBarcodeSchema = z.object({
 });
 
 export const createItemSchema = z.object({
-  barcode: z.string().min(1, "Barcode is required"),
+  barcode: z.string().optional(),
   name: z.string().min(1, "Name is required"),
 });
 

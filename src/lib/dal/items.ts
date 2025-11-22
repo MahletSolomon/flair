@@ -20,7 +20,7 @@ export async function checkItemByBarcode(
 }
 
 export async function createItem(
-  payload: { barcode: string; name: string }
+  payload: { barcode?: string; name: string }
 ): Promise<ApiResult<Item>> {
   const url = buildUrl("/api/items/create");
   return jsonFetch<Item>(url, {
