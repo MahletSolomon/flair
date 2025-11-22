@@ -34,6 +34,8 @@ export const entries = pgTable("entries", {
     .references(() => items.id, { onDelete: "cascade" }),
   size: varchar("size", { length: 50 }),
   quantity: integer("quantity").notNull(),
+  buyingPrice: integer("buying_price").notNull(),
+  sellingPrice: integer("selling_price").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

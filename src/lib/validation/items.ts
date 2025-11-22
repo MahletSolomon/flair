@@ -12,11 +12,13 @@ export const createItemSchema = z.object({
 
 export const createEntrySchema = z.object({
   itemId: z.number().int().positive(),
-  size: z.string().min(1, "Size is required"),
+  size: z.string().min(1, "").optional(),
   quantity: z
     .number({ error: "Quantity must be a number" })
     .int("Quantity must be an integer")
     .positive("Quantity must be positive"),
+  buyingPrice: z.number().positive("Buying price required"),   // ⬅ new
+  sellingPrice: z.number().positive("Selling price required"),
 });
 
 // Types
@@ -34,7 +36,10 @@ export type Item = {
 export type Entry = {
   id: number;
   itemId: number;
-  size: string;
+  size?: string | null;     // ⬅ optional
   quantity: number;
+  buyingPrice: number;      // ⬅ new
+  sellingPrice: number;     // ⬅ new
   createdAt: string | Date;
 };
+
