@@ -44,10 +44,10 @@ export default async function ItemsPage() {
                   key={item.id}
                   className="border-t border-slate-800 hover:bg-slate-800/40"
                 >
-                  <td className="px-3 py-2 break-all">{item.barcode}</td>
-                  <td className="px-3 py-2 hidden sm:table-cell">
-                    {item.name ?? "-"}
+                  <td className="px-3 py-2 sm:table-cell hidden break-all">
+                    {item.barcode}
                   </td>
+                  <td className="px-3 py-2 break-all">{item.name ?? "-"}</td>
                   {/* <td className="px-3 py-2 hidden md:table-cell">
                     {item.languageCode ?? "-"}
                   </td> */}
