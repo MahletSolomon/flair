@@ -5,10 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 import { checkItemByBarcode, createItem, createEntry } from "@/lib/dal/items";
 import { createItemSchema, createEntrySchema } from "@/lib/validation/items";
 import { CameraBarcodeScanner } from "./CamerBarcodeScanner";
+import { lookupBarcodePublic } from "@/lib/dal/barcodePublic";
 
 export function BarcodeScannerForm() {
   const [barcode, setBarcode] = useState("");
@@ -25,11 +25,17 @@ export function BarcodeScannerForm() {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  // public lookup state
+  const [lookupBusy, setLookupBusy] = useState(false);
+  const [lookupMsg, setLookupMsg] = useState<string | null>(null);
+
   async function handleLookup(code: string) {
     if (!code) return;
+
     setChecking(true);
     setError(null);
     setSuccessMsg(null);
+    setLookupMsg(null);
     setFieldErrors({});
 
     const res = await checkItemByBarcode(code);
@@ -43,11 +49,32 @@ export function BarcodeScannerForm() {
     const item = res.data!.item;
 
     if (exists && item) {
+      // Existing item → lock name to DB value (read-only via disabled)
       setItemId(item.id);
       setName(item.name ?? "");
+      setLookupMsg(null);
     } else {
+      // New item → clear id, allow editing, and auto-lookup
       setItemId(null);
-      setName("");
+
+      // Only auto-fill if the user hasn't typed anything yet
+      if (!name.trim()) {
+        setLookupBusy(true);
+        try {
+          const r = await lookupBarcodePublic(code);
+          if (r.name) {
+            setName(r.name);
+            setLookupMsg(`Filled from ${r.source}. You can edit it.`);
+          } else {
+            setLookupMsg("Not found on public sources. Please enter a name.");
+          }
+        } finally {
+          setLookupBusy(false);
+        }
+      } else {
+        // user already typed a name—don’t overwrite it
+        setLookupMsg("Using your typed name (public sources not applied).");
+      }
     }
 
     setChecking(false);
@@ -55,10 +82,12 @@ export function BarcodeScannerForm() {
 
   function handleBarcodeChange(v: string) {
     setBarcode(v);
+    // debounce if you like; for now we trigger immediately when non-empty
     if (v.trim()) void handleLookup(v.trim());
     else {
       setItemId(null);
       setName("");
+      setLookupMsg(null);
     }
   }
 
@@ -131,7 +160,7 @@ export function BarcodeScannerForm() {
 
   return (
     <>
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-white border-slate-200">
         <CardHeader>
           <CardTitle className="flex items-center justify-between gap-2 text-lg md:text-xl">
             <span>Scan / Enter Item</span>
@@ -157,30 +186,32 @@ export function BarcodeScannerForm() {
                 placeholder="Scan or type barcode"
                 required
               />
-              <p className="text-xs text-slate-400 min-h-[1rem]">
+              <p className="text-xs text-slate-500 min-h-[1rem]">
                 {checking
                   ? "Checking…"
                   : itemId
                   ? "Existing item"
                   : barcode
-                  ? "New item"
+                  ? lookupBusy
+                    ? "Looking up name from public sources…"
+                    : lookupMsg || "New item"
                   : ""}
               </p>
             </div>
 
-            {/* Name (readonly if existing) */}
+            {/* Name (read-only if existing; editable if new or auto-filled) */}
             <div className="grid gap-2">
               <Label htmlFor="name">Name</Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Item name"
-                disabled={!!itemId}
+                placeholder="Product name"
+                disabled={!!itemId} // disable only when item exists in DB
                 required
               />
               {fieldErrors.name && (
-                <p className="text-xs text-red-400">{fieldErrors.name}</p>
+                <p className="text-xs text-red-500">{fieldErrors.name}</p>
               )}
             </div>
 
@@ -196,9 +227,10 @@ export function BarcodeScannerForm() {
                   required
                 />
                 {fieldErrors.size && (
-                  <p className="text-xs text-red-400">{fieldErrors.size}</p>
+                  <p className="text-xs text-red-500">{fieldErrors.size}</p>
                 )}
               </div>
+
               <div className="grid gap-2">
                 <Label htmlFor="quantity">Quantity</Label>
                 <Input
@@ -211,14 +243,14 @@ export function BarcodeScannerForm() {
                   required
                 />
                 {fieldErrors.quantity && (
-                  <p className="text-xs text-red-400">{fieldErrors.quantity}</p>
+                  <p className="text-xs text-red-500">{fieldErrors.quantity}</p>
                 )}
               </div>
             </div>
 
-            {error && <p className="text-xs text-red-400">{error}</p>}
+            {error && <p className="text-xs text-red-500">{error}</p>}
             {successMsg && (
-              <p className="text-xs text-green-400">{successMsg}</p>
+              <p className="text-xs text-green-600">{successMsg}</p>
             )}
 
             <Button className="w-full" disabled={loading || !barcode}>
