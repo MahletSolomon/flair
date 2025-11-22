@@ -8,7 +8,7 @@ export default async function ItemsPage() {
   const items = res.data ?? [];
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-50">
+    <main className="min-h-screen overflow-auto bg-slate-950 text-slate-50">
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-4">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
           <h1 className="text-2xl font-semibold">All Items</h1>
@@ -22,7 +22,7 @@ export default async function ItemsPage() {
 
         {res.error && <p className="text-sm text-red-400">{res.error}</p>}
 
-        <div className="overflow-x-auto rounded-lg border border-slate-800 bg-slate-900">
+        <div className="overflow-auto rounded-lg border border-slate-800 bg-slate-900">
           <table className="min-w-full text-sm">
             <thead className="bg-slate-800/60">
               <tr>
@@ -42,7 +42,7 @@ export default async function ItemsPage() {
               {items.map((item) => (
                 <tr
                   key={item.id}
-                  className="border-t border-slate-800 hover:bg-slate-800/40"
+                  className="border-t border-slate-800 hover:bg-slate-800/40 "
                 >
                   <td className="px-3 py-2 sm:table-cell hidden break-all">
                     {item.barcode}
