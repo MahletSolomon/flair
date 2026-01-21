@@ -31,6 +31,10 @@ export type Item = {
   barcode: string;
   name: string;
   createdAt: string | Date;
+  // Aggregated entry data
+  totalQuantity?: number;
+  avgBuyingPrice?: number;
+  avgSellingPrice?: number;
 };
 
 export type Entry = {
